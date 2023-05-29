@@ -43,6 +43,20 @@ class Twilio
             return $this->sendSmsMessage($message, $to);
         }
 
+        if ($message instanceof TwilioWhatsAppMessage) {
+            if ($useAlphanumericSender && $sender = $this->getAlphanumericSender()) {
+                if(substr($sender,0,9) != 'whatsapp:')
+                {
+                    $message->from("whatsapp:" . $sender);
+                }
+                else {
+                    $message->from($sender);
+                }
+            }
+
+            return $this->sendWhatsAppMessage($message, $to);
+        }
+
         if ($message instanceof TwilioCallMessage) {
             return $this->makeCall($message, $to);
         }
@@ -102,6 +116,62 @@ class Twilio
             $this->fillOptionalParams($params, $message, [
                 'mediaUrl',
             ]);
+        }
+
+        return $this->twilioService->messages->create($to, $params);
+    }
+
+    /**
+     * Send an sms message using the Twilio Service.
+     *
+     * @param TwilioWhatsAppMessage $message
+     * @param string|null $to
+     *
+     * @return MessageInstance
+     * @throws CouldNotSendNotification
+     * @throws TwilioException
+     */
+    protected function sendWhatsAppMessage(TwilioWhatsAppMessage $message, ?string $to): MessageInstance
+    {
+        $debugTo = $this->config->getDebugTo();
+
+        if (!empty($debugTo)) {
+            $to = $debugTo;
+        }
+
+        $params = [
+            'body' => trim($message->content),
+        ];
+
+        if ($messagingServiceSid = $this->getMessagingServiceSid($message)) {
+            $params['messagingServiceSid'] = $messagingServiceSid;
+        }
+
+        if ($this->config->isShortenUrlsEnabled()) {
+            $params['ShortenUrls'] = "true";
+        }
+
+        if ($from = $this->getFrom($message)) {
+            $params['from'] = $from;
+        }
+
+        if (empty($from) && empty($messagingServiceSid)) {
+            throw CouldNotSendNotification::missingFrom();
+        }
+
+        $this->fillOptionalParams($params, $message, [
+            'statusCallback',
+            'statusCallbackMethod',
+            'applicationSid',
+            'forceDelivery',
+            'maxPrice',
+            'provideFeedback',
+            'validityPeriod',
+        ]);
+        
+        if(substr($to,0,9) != 'whatsapp:')
+        {
+            $to = "whatsapp:" . $to;
         }
 
         return $this->twilioService->messages->create($to, $params);
