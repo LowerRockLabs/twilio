@@ -74,6 +74,22 @@ class TwilioChannelTest extends MockeryTestCase
     }
 
     /** @test */
+    public function it_will_send_a_whatsapp_message_to_the_result_of_the_route_method_of_the_notifiable()
+    {
+        $notifiable = new NotifiableWithMethod();
+        $notification = Mockery::mock(Notification::class);
+
+        $message = new TwilioWhatsAppMessage('Message text');
+        $notification->shouldReceive('toTwilio')->andReturn($message);
+
+        $this->twilio->shouldReceive('sendMessage')
+            ->atLeast()->once()
+            ->with($message, '+1111111111', false);
+
+        $this->channel->send($notifiable, $notification);
+    }
+
+    /** @test */
     public function it_will_make_a_call_to_the_phone_number_attribute_of_the_notifiable()
     {
         $notifiable = new NotifiableWithAttribute();

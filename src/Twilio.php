@@ -233,10 +233,10 @@ class Twilio
     /**
      * Get the messaging service SID from message, or config.
      *
-     * @param TwilioSmsMessage $message
+     * @param TwilioSmsMessage|TwilioWhatsAppMessage $message
      * @return string|null
      */
-    protected function getMessagingServiceSid(TwilioSmsMessage $message): ?string
+    protected function getMessagingServiceSid(TwilioSmsMessage|TwilioWhatsAppMessage $message): ?string
     {
         return $message->getMessagingServiceSid() ?: $this->config->getServiceSid();
     }

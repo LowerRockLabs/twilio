@@ -6,6 +6,7 @@ namespace NotificationChannels\Twilio\Exceptions;
 
 use NotificationChannels\Twilio\TwilioCallMessage;
 use NotificationChannels\Twilio\TwilioSmsMessage;
+use NotificationChannels\Twilio\TwilioWhatsAppMessage;
 
 class CouldNotSendNotification extends \Exception
 {
@@ -15,7 +16,7 @@ class CouldNotSendNotification extends \Exception
 
         return new static(
             "Notification was not sent. Message object class `{$className}` is invalid. It should
-            be either `".TwilioSmsMessage::class.'` or `'.TwilioCallMessage::class.'`');
+            be either `".TwilioSmsMessage::class.'` or `'.TwilioCallMessage::class.'` or `'.TwilioWhatsAppMessage::class.'`');
     }
 
     public static function missingFrom(): self

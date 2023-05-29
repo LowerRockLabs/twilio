@@ -2,6 +2,11 @@
 
 All notable changes to `twilio` will be documented in this file
 
+## 3.0.1
+
+- Add Twilio SDK 7.0 Support
+- Add WhatsAppMessage capability
+
 ## 3.0.0
 
 This is a major release with breaking changes. Please see the upgrading section in the readme for more info.

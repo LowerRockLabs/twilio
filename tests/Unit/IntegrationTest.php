@@ -11,6 +11,7 @@ use NotificationChannels\Twilio\TwilioCallMessage;
 use NotificationChannels\Twilio\TwilioChannel;
 use NotificationChannels\Twilio\TwilioConfig;
 use NotificationChannels\Twilio\TwilioSmsMessage;
+use NotificationChannels\Twilio\TwilioWhatsAppMessage;
 use Twilio\Rest\Api\V2010\Account\CallInstance;
 use Twilio\Rest\Api\V2010\Account\CallList;
 use Twilio\Rest\Api\V2010\Account\MessageInstance;
@@ -83,6 +84,29 @@ class IntegrationTest extends MockeryTestCase
     }
 
     /** @test */
+    public function it_can_send_a_whatsapp_message_using_service()
+    {
+        $message = TwilioWhatsAppMessage::create('Message text');
+        $this->notification->shouldReceive('toTwilio')->andReturn($message);
+
+        $config = new TwilioConfig([
+            'from' => '+31612345678',
+            'sms_service_sid' => '0123456789',
+        ]);
+        $twilio = new Twilio($this->twilioService, $config);
+        $channel = new TwilioChannel($twilio, $this->events);
+
+        $this->smsMessageWillBeSentToTwilioWith('+22222222222', [
+            'from' => '+31612345678',
+            'body' => 'Message text',
+            'messagingServiceSid' => '0123456789',
+        ]);
+
+        $channel->send(new NotifiableWithAttribute(), $this->notification);
+    }
+    
+
+    /** @test */
     public function it_can_send_a_sms_message_using_url_shortener()
     {
         $message = TwilioSmsMessage::create('Message text');
@@ -108,6 +132,27 @@ class IntegrationTest extends MockeryTestCase
     public function it_can_send_a_sms_message_using_alphanumeric_sender()
     {
         $message = TwilioSmsMessage::create('Message text');
+        $this->notification->shouldReceive('toTwilio')->andReturn($message);
+
+        $config = new TwilioConfig([
+            'from' => '+31612345678',
+            'alphanumeric_sender' => 'TwilioTest',
+        ]);
+        $twilio = new Twilio($this->twilioService, $config);
+        $channel = new TwilioChannel($twilio, $this->events);
+
+        $this->smsMessageWillBeSentToTwilioWith('+33333333333', [
+            'from' => 'TwilioTest',
+            'body' => 'Message text',
+        ]);
+
+        $channel->send(new NotifiableWithAlphanumericSender(), $this->notification);
+    }
+
+    /** @test */
+    public function it_can_send_a_whatsapp_message_using_alphanumeric_sender()
+    {
+        $message = TwilioWhatsAppMessage::create('Message text');
         $this->notification->shouldReceive('toTwilio')->andReturn($message);
 
         $config = new TwilioConfig([

@@ -12,6 +12,7 @@ use NotificationChannels\Twilio\TwilioConfig;
 use NotificationChannels\Twilio\TwilioMessage;
 use NotificationChannels\Twilio\TwilioMmsMessage;
 use NotificationChannels\Twilio\TwilioSmsMessage;
+use NotificationChannels\Twilio\TwilioWhatsAppMessage;
 use Twilio\Rest\Api\V2010\Account\CallInstance;
 use Twilio\Rest\Api\V2010\Account\CallList;
 use Twilio\Rest\Api\V2010\Account\MessageInstance;
@@ -87,6 +88,47 @@ class TwilioTest extends MockeryTestCase
 
         $this->twilio->sendMessage($message, '+1111111111');
     }
+    
+    /** @test */
+    public function it_can_send_a_whatsapp_message_to_twilio()
+    {
+        $message = new TwilioWhatsAppMessage('Message text');
+        $message->statusCallback('http://example.com');
+        $message->statusCallbackMethod('PUT');
+        $message->applicationSid('ABCD1234');
+        $message->maxPrice(0.05);
+        $message->provideFeedback(true);
+        $message->validityPeriod(120);
+
+        $this->config->shouldReceive('getFrom')
+            ->once()
+            ->andReturn('+1234567890');
+
+        $this->config->shouldReceive('getDebugTo')
+            ->once()
+            ->andReturn(null);
+
+        $this->config->shouldReceive('getServiceSid')
+            ->once()
+            ->andReturn(null);
+
+        $this->twilioService->messages->shouldReceive('create')
+            ->atLeast()->once()
+            ->with('+1111111111', [
+                'from' => '+1234567890',
+                'body' => 'Message text',
+                'statusCallback' => 'http://example.com',
+                'statusCallbackMethod' => 'PUT',
+                'applicationSid' => 'ABCD1234',
+                'maxPrice' => 0.05,
+                'provideFeedback' => true,
+                'validityPeriod' => 120,
+            ])
+            ->andReturn(Mockery::mock(MessageInstance::class));
+
+        $this->twilio->sendMessage($message, '+1111111111');
+    }
+    
 
     /** @test */
     public function it_can_send_a_mms_message_to_twilio()
@@ -255,6 +297,48 @@ class TwilioTest extends MockeryTestCase
         $debugTo = '+1222222222';
 
         $message = new TwilioSmsMessage('Message text');
+        $message->statusCallback('http://example.com');
+        $message->statusCallbackMethod('PUT');
+        $message->applicationSid('ABCD1234');
+        $message->maxPrice(0.05);
+        $message->provideFeedback(true);
+        $message->validityPeriod(120);
+
+        $this->config->shouldReceive('getFrom')
+            ->once()
+            ->andReturn('+1234567890');
+
+        $this->config->shouldReceive('getDebugTo')
+            ->once()
+            ->andReturn($debugTo);
+
+        $this->config->shouldReceive('getServiceSid')
+            ->once()
+            ->andReturn(null);
+
+        $this->twilioService->messages->shouldReceive('create')
+            ->atLeast()->once()
+            ->with($debugTo, [
+                'from' => '+1234567890',
+                'body' => 'Message text',
+                'statusCallback' => 'http://example.com',
+                'statusCallbackMethod' => 'PUT',
+                'applicationSid' => 'ABCD1234',
+                'maxPrice' => 0.05,
+                'provideFeedback' => true,
+                'validityPeriod' => 120,
+            ])
+            ->andReturn(Mockery::mock(MessageInstance::class));
+
+        $this->twilio->sendMessage($message, '+1111111111');
+    }
+
+    /** @test */
+    public function it_should_use_universal_to_whatsapp()
+    {
+        $debugTo = '+1222222222';
+
+        $message = new TwilioWhatsAppMessage('Message text');
         $message->statusCallback('http://example.com');
         $message->statusCallbackMethod('PUT');
         $message->applicationSid('ABCD1234');
