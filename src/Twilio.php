@@ -36,26 +36,18 @@ class Twilio
      */
     public function sendMessage(TwilioMessage $message, ?string $to, bool $useAlphanumericSender = false)
     {
+
+        if ($message instanceof TwilioWhatsAppMessage) {
+            return $this->sendWhatsAppMessage($message, $to);
+        }
+
+
         if ($message instanceof TwilioSmsMessage) {
             if ($useAlphanumericSender && $sender = $this->getAlphanumericSender()) {
                 $message->from($sender);
             }
 
             return $this->sendSmsMessage($message, $to);
-        }
-
-        if ($message instanceof TwilioWhatsAppMessage) {
-            if ($useAlphanumericSender && $sender = $this->getAlphanumericSender()) {
-                if(substr($sender,0,9) != 'whatsapp:')
-                {
-                    $message->from("whatsapp:" . $sender);
-                }
-                else {
-                    $message->from($sender);
-                }
-            }
-
-            return $this->sendWhatsAppMessage($message, $to);
         }
 
         if ($message instanceof TwilioCallMessage) {
