@@ -3,6 +3,7 @@
 namespace NotificationChannels\Twilio;
 
 use NotificationChannels\Twilio\Exceptions\CouldNotSendNotification;
+use NotificationChannels\Twilio\Exceptions\TwilioNotificationRestException;
 use Twilio\Exceptions\TwilioException;
 use Twilio\Rest\Api\V2010\Account\CallInstance;
 use Twilio\Rest\Api\V2010\Account\MessageInstance;
@@ -118,7 +119,13 @@ class Twilio
             ]);
         }
 
-        return $this->twilioService->messages->create($to, $params);
+        try {
+            return $this->twilioService->messages->create($to, $params);
+        } catch (RestException $e) {
+            throw new TwilioNotificationRestException(
+                $to, $params, $e->getMessage(), $e->getCode(), $e->getStatusCode(), $e->getMoreInfo(), $e->getDetails()
+            );
+        }
     }
 
     /**
@@ -174,7 +181,13 @@ class Twilio
             $to = "whatsapp:" . $to;
         }
 
-        return $this->twilioService->messages->create($to, $params);
+        try {
+            return $this->twilioService->messages->create($to, $params);
+        } catch (RestException $e) {
+            throw new TwilioNotificationRestException(
+                ltrim($to,'whatsapp:'), $params, $e->getMessage(), $e->getCode(), $e->getStatusCode(), $e->getMoreInfo(), $e->getDetails()
+            );
+        }
     }
 
     /**
