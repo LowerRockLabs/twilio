@@ -38,4 +38,5 @@ class CouldNotSendNotification extends \Exception
             'Notification was not sent. Missing `alphanumeric_sender` in config'
         );
     }
+
 }

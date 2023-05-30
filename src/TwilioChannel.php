@@ -47,10 +47,11 @@ class TwilioChannel
             $to = $this->getTo($notifiable, $notification);
             $message = $notification->toTwilio($notifiable);
             $useSender = $this->canReceiveAlphanumericSender($notifiable);
-            
+
             if ($notification instanceof TwilioWhatsAppMessage) {
-                return $this->twilio->sendMessage($message, $to, $useSender);
+                return $this->twilio->sendMessage($message, $to, false);
             }
+
 
             if ($notification instanceof TwilioSmsMessage) {
                 return $this->twilio->sendMessage($message, $to, $useSender);
@@ -65,6 +66,7 @@ class TwilioChannel
             }
 
             return $this->twilio->sendMessage($message, $to, $useSender);
+
         } catch (Exception $exception) {
             $event = new NotificationFailed(
                 $notifiable,

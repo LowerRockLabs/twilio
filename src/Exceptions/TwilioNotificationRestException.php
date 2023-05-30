@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace NotificationChannels\Twilio\Exceptions;
 
-class TwilioNotificationRestException extends \Twilio\Exceptions\RestException {
+class TwilioNotificationRestException extends \Twilio\Exceptions\RestException 
+{
 
     protected $to;
     protected $params;
