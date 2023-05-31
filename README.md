@@ -12,6 +12,9 @@ This package makes it easy to send [Twilio notifications](https://documentation.
 
 You are viewing the `3.x` documentation. [Click here](https://github.com/laravel-notification-channels/twilio/tree/2.x) to view the `2.x` documentation.
 
+
+# THIS IS A FORK UNDER DEVELOPMENT - CAUTION IS ADVISED IN USING THIS
+
 ## Contents
 
 - [Installation](#installation)
@@ -163,6 +166,15 @@ public function routeNotificationForTwilio()
 }
 ```
 
+If you would like to override this for WhatsApp Messages,  add the `routeNotificationForTwilioWhatsApp` method to your Notifiable model.
+
+```php
+public function routeNotificationForTwilio()
+{
+    return '+1234567890';
+}
+```
+
 ### Available Message methods
 
 #### TwilioSmsMessage
@@ -170,6 +182,13 @@ public function routeNotificationForTwilio()
 - `from('')`: Accepts a phone to use as the notification sender.
 - `content('')`: Accepts a string value for the notification body.
 - `messagingServiceSid('')`: Accepts a messaging service SID to handle configuration.
+
+#### TwilioWhatsAppMessage
+
+- `from('')`: Accepts a phone to use as the notification sender.
+- `content('')`: Accepts a string value for the notification body.
+- `messagingServiceSid('')`: Accepts a messaging service SID to handle configuration.
+
 
 #### TwilioCallMessage
 

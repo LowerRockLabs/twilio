@@ -112,6 +112,9 @@ class TwilioChannel
         if ($notifiable->routeNotificationFor(self::class, $notification)) {
             return $notifiable->routeNotificationFor(self::class, $notification);
         }
+        if ($notifiable->routeNotificationFor('twilioWhatsApp', $notification)) {
+            return $notifiable->routeNotificationFor('twilioWhatsApp', $notification);
+        }
         if ($notifiable->routeNotificationFor('twilio', $notification)) {
             return $notifiable->routeNotificationFor('twilio', $notification);
         }
