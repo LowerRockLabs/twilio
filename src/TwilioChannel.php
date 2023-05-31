@@ -7,6 +7,7 @@ use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Notifications\Events\NotificationFailed;
 use Illuminate\Notifications\Notification;
 use NotificationChannels\Twilio\Exceptions\CouldNotSendNotification;
+use Illuminate\Support\Facades\Log;
 
 class TwilioChannel
 {
@@ -45,20 +46,31 @@ class TwilioChannel
     {
         try {
             $to = $this->getTo($notifiable, $notification);
+            
+            if ($notification->customMethod == "whatsapp")
+            {
+                $message = $notification->toTwilioWhatsApp($notifiable);
+                if ($message instanceof TwilioWhatsAppMessage) {
+                    Log::info('Message is Instance of TwilioWhatsAppMessage');
+                    return $this->twilio->sendMessage($message, $message->getTo($to), false);
+                }
+            }
+
             $useSender = $this->canReceiveAlphanumericSender($notifiable);
 
-            if ($notification instanceof TwilioWhatsAppMessage) {
-                $message = $notification->toTwilioWhatsApp($notifiable) ?? $notification->toTwilio($notifiable);
-                return $this->twilio->sendMessage($message, $to, false);
-            }
+            //if (is_string($message)) {
+            //    $message = new TwilioSmsMessage($message);
+            //}
+            
 
 
-            if ($notification instanceof TwilioSmsMessage) {
-                $message = $notification->toTwilioSms($notifiable) ?? $notification->toTwilio($notifiable);
+            if ($message instanceof TwilioSmsMessage) {
+                Log::info('Message is Instance of TwilioSmsMessage');
+
+                //$message = new TwilioWhatsAppMessage($message);
                 return $this->twilio->sendMessage($message, $to, $useSender);
             }
-            $message = $notification->toTwilio($notifiable);
-
+            
             if (is_string($message)) {
                 $message = new TwilioSmsMessage($message);
             }
@@ -68,7 +80,6 @@ class TwilioChannel
             }
 
             return $this->twilio->sendMessage($message, $to, $useSender);
-
         } catch (Exception $exception) {
             $event = new NotificationFailed(
                 $notifiable,

@@ -24,6 +24,20 @@ class TwilioWhatsAppMessage extends TwilioSmsMessage
         return null;
     }
 
+        /**
+     * Get the from address of this message.
+     *
+     * @return string
+     */
+    public function getTo(string $to): string
+    {
+        if(substr($to,0,9) != 'whatsapp:')
+        {
+            $to = 'whatsapp:' . $to;
+        }
+        return $to;
+    }
+
     /**
      * Set the alphanumeric sender.
      *

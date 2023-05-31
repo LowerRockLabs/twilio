@@ -8,6 +8,7 @@ use Twilio\Exceptions\TwilioException;
 use Twilio\Rest\Api\V2010\Account\CallInstance;
 use Twilio\Rest\Api\V2010\Account\MessageInstance;
 use Twilio\Rest\Client as TwilioService;
+use Illuminate\Support\Facades\Log;
 
 class Twilio
 {
@@ -38,6 +39,8 @@ class Twilio
     {
 
         if ($message instanceof TwilioWhatsAppMessage) {
+            Log::info('sendMessage Message is Instance of TwilioWhatsAppMessage');
+
             return $this->sendWhatsAppMessage($message, $to);
         }
 
@@ -151,6 +154,11 @@ class Twilio
         }
 
         if ($from = $this->getFrom($message)) {
+            if(substr($from,0,9) != 'whatsapp:')
+            {
+                $from = 'whatsapp:' . $from;
+            }
+
             $params['from'] = $from;
         }
 
@@ -172,6 +180,9 @@ class Twilio
         {
             $to = "whatsapp:" . $to;
         }
+        Log::info('TwilioWhatsAppMessage TO: '.$to);
+        Log::info('Params');
+        Log::info($params);
 
         try {
             return $this->twilioService->messages->create($to, $params);

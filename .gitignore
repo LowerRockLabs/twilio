@@ -27,3 +27,4 @@ phpunit.phar
 
 # build
 build
+.history/*
