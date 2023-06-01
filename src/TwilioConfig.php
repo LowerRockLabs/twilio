@@ -40,6 +40,11 @@ class TwilioConfig
         return $this->config['password'] ?? null;
     }
 
+    public function getSid(): ?string
+    {
+        return $this->config['sid'] ?? null;
+    }
+
     public function getAccountSid(): ?string
     {
         return $this->config['account_sid'] ?? null;
@@ -68,6 +73,11 @@ class TwilioConfig
     public function getIgnoredErrorCodes(): array
     {
         return $this->config['ignored_error_codes'] ?? [];
+    }
+
+    public function isEnabled()
+    {
+        return $this->config['enabled'] ?? true;
     }
 
     public function isIgnoredErrorCode(int $code): bool

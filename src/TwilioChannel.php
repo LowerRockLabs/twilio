@@ -44,17 +44,21 @@ class TwilioChannel
      */
     public function send($notifiable, Notification $notification)
     {
+        if (! $this->twilio->config->isEnabled()) {
+            return;
+        }
+
         try {
             $to = $this->getTo($notifiable, $notification);
             if($to === null) return;
             $message = $notification->toTwilio($notifiable);
-            $useSender = $this->canReceiveAlphanumericSender($notifiable);
 
 
             if ($message instanceof TwilioWhatsAppMessage)
             {
                 return $this->twilio->sendMessage($message, $message->getTo($to), false);
             }
+            $useSender = $this->canReceiveAlphanumericSender($notifiable);
 
             if ($message instanceof TwilioSmsMessage) {
                 return $this->twilio->sendMessage($message, $to, $useSender);
