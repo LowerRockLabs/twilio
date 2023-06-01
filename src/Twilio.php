@@ -39,8 +39,6 @@ class Twilio
     {
 
         if ($message instanceof TwilioWhatsAppMessage) {
-            Log::info('sendMessage Message is Instance of TwilioWhatsAppMessage');
-
             return $this->sendWhatsAppMessage($message, $to);
         }
 
@@ -49,7 +47,6 @@ class Twilio
             if ($useAlphanumericSender && $sender = $this->getAlphanumericSender()) {
                 $message->from($sender);
             }
-
             return $this->sendSmsMessage($message, $to);
         }
 
@@ -141,6 +138,8 @@ class Twilio
             $to = $debugTo;
         }
 
+        $to = (substr($to,0,9) == 'whatsapp:') ? $to : "whatsapp:" . $to;
+
         $params = [
             'body' => trim($message->content),
         ];
@@ -154,12 +153,7 @@ class Twilio
         }
 
         if ($from = $this->getFrom($message)) {
-            if(substr($from,0,9) != 'whatsapp:')
-            {
-                $from = 'whatsapp:' . $from;
-            }
-
-            $params['from'] = $from;
+            $params['from'] = $from = (substr($from,0,9) == 'whatsapp:') ? $from : 'whatsapp:' . $from; 
         }
 
         if (empty($from) && empty($messagingServiceSid)) {
@@ -175,14 +169,7 @@ class Twilio
             'provideFeedback',
             'validityPeriod',
         ]);
-        
-        if(substr($to,0,9) != 'whatsapp:')
-        {
-            $to = "whatsapp:" . $to;
-        }
-        Log::info('TwilioWhatsAppMessage TO: '.$to);
-        Log::info('Params');
-        Log::info($params);
+
 
         try {
             return $this->twilioService->messages->create($to, $params);

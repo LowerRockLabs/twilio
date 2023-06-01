@@ -46,28 +46,17 @@ class TwilioChannel
     {
         try {
             $to = $this->getTo($notifiable, $notification);
-            
-            if ($notification->customMethod == "whatsapp")
-            {
-                $message = $notification->toTwilioWhatsApp($notifiable);
-                if ($message instanceof TwilioWhatsAppMessage) {
-                    Log::info('Message is Instance of TwilioWhatsAppMessage');
-                    return $this->twilio->sendMessage($message, $message->getTo($to), false);
-                }
-            }
-
+            if($to === null) return;
+            $message = $notification->toTwilio($notifiable);
             $useSender = $this->canReceiveAlphanumericSender($notifiable);
 
-            //if (is_string($message)) {
-            //    $message = new TwilioSmsMessage($message);
-            //}
-            
 
+            if ($message instanceof TwilioWhatsAppMessage)
+            {
+                return $this->twilio->sendMessage($message, $message->getTo($to), false);
+            }
 
             if ($message instanceof TwilioSmsMessage) {
-                Log::info('Message is Instance of TwilioSmsMessage');
-
-                //$message = new TwilioWhatsAppMessage($message);
                 return $this->twilio->sendMessage($message, $to, $useSender);
             }
             

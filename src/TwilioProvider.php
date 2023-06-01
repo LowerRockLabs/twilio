@@ -6,6 +6,7 @@ use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\Support\DeferrableProvider;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Facades\Notification;
 use NotificationChannels\Twilio\Exceptions\InvalidConfigException;
 use Twilio\Rest\Client as TwilioService;
 
@@ -60,6 +61,12 @@ class TwilioProvider extends ServiceProvider implements DeferrableProvider
                 $app->make(Twilio::class),
                 $app->make(Dispatcher::class)
             );
+        });
+
+        Notification::resolved(function (ChannelManager $service) {
+            $service->extend('twilio', function (Application $app) {
+                return $app->make(TwilioChannel::class);
+            });
         });
     }
 
