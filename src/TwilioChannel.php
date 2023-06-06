@@ -29,7 +29,14 @@ class TwilioChannel
      */
     public function __construct(Twilio $twilio, Dispatcher $events)
     {
-        $this->twilio = $twilio;
+        try {
+            $this->twilio = $twilio;
+        }
+        catch (Exception $exception)
+        {
+            report($exception);
+            throw CouldNotSendNotification::invalidAuth();
+        }
         $this->events = $events;
     }
 

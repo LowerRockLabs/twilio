@@ -112,11 +112,14 @@ class Twilio
         }
 
         try {
-            return $this->twilioService->messages->create($to, $params);
-        } catch (RestException $e) {
-            throw new TwilioNotificationRestException(
-                $to, $params, $e->getMessage(), $e->getCode(), $e->getStatusCode(), $e->getMoreInfo(), $e->getDetails()
-            );
+            $result = $this->twilioService->messages->create($to, $params);
+        } catch (Throwable  $e) {
+            report($e);
+            throw CouldNotSendNotification::serviceRespondedWithAnError($e, 'Fail');
+        }
+        if (isset($result))
+        {
+            return $result;
         }
     }
 

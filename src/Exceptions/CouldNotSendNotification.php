@@ -9,7 +9,7 @@ use NotificationChannels\Twilio\TwilioSmsMessage;
 use NotificationChannels\Twilio\TwilioWhatsAppMessage;
 
 class CouldNotSendNotification extends \Exception
-{
+{ 
     public static function invalidMessageObject($message): self
     {
         $className = is_object($message) ? get_class($message) : 'Unknown';
@@ -36,6 +36,18 @@ class CouldNotSendNotification extends \Exception
     {
         return new static(
             'Notification was not sent. Missing `alphanumeric_sender` in config'
+        );
+    }
+    
+    public static function serviceRespondedWithAnError($exception, $message = null)
+    {
+        return new static('Could Not Send SMS : '.$exception->getMessage() . ' message: ' . $message);
+    }
+
+    public static function invalidAuth(): self
+    {
+        return new static(
+            'The Twilio Auth failed.'
         );
     }
 
